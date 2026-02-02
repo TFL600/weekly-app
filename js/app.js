@@ -338,6 +338,13 @@
         data.phone = document.getElementById('waPhone').value.trim();
         data.message = document.getElementById('waMessage').value.trim();
         break;
+      case 'email':
+        data.email = document.getElementById('emailTo').value.trim();
+        data.subject = document.getElementById('emailSubject').value.trim();
+        break;
+      case 'spotify':
+        data.url = document.getElementById('spotifyUrl').value.trim();
+        break;
       // calendar doesn't need additional data
     }
 
@@ -350,6 +357,13 @@
     // WhatsApp
     document.getElementById('waPhone').value = data.phone || '';
     document.getElementById('waMessage').value = data.message || '';
+
+    // Email
+    document.getElementById('emailTo').value = data.email || '';
+    document.getElementById('emailSubject').value = data.subject || '';
+
+    // Spotify
+    document.getElementById('spotifyUrl').value = data.url || '';
   }
 
   // ============ Drag and Drop ============

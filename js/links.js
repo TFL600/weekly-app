@@ -9,7 +9,9 @@ const Links = (function() {
   const linkTypes = {
     none: { icon: '❌', label: 'None' },
     whatsapp: { icon: '💬', label: 'WhatsApp' },
-    calendar: { icon: '📅', label: 'Calendar' }
+    calendar: { icon: '📅', label: 'Calendar' },
+    email: { icon: '📧', label: 'Email' },
+    spotify: { icon: '🎵', label: 'Spotify' }
   };
 
   /**
@@ -39,6 +41,36 @@ const Links = (function() {
   }
 
   /**
+   * Generate mailto link
+   * @param {Object} data - { email: string, subject?: string }
+   */
+  function generateEmailLink(data) {
+    if (!data.email) return null;
+
+    let url = `mailto:${data.email}`;
+    const params = [];
+
+    if (data.subject) {
+      params.push(`subject=${encodeURIComponent(data.subject)}`);
+    }
+
+    if (params.length > 0) {
+      url += `?${params.join('&')}`;
+    }
+
+    return url;
+  }
+
+  /**
+   * Generate Spotify link
+   * @param {Object} data - { url: string }
+   */
+  function generateSpotifyLink(data) {
+    if (!data.url) return 'https://open.spotify.com';
+    return data.url;
+  }
+
+  /**
    * Generate link based on type and data
    * @param {string} type - Link type
    * @param {Object} data - Link-specific data
@@ -49,6 +81,10 @@ const Links = (function() {
         return generateWhatsAppLink(data);
       case 'calendar':
         return generateCalendarLink();
+      case 'email':
+        return generateEmailLink(data);
+      case 'spotify':
+        return generateSpotifyLink(data);
       default:
         return null;
     }

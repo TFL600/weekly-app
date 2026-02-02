@@ -105,6 +105,14 @@
               <span class="link-icon">📅</span>
               <span>Calendar</span>
             </button>
+            <button type="button" class="link-type-btn" data-type="email">
+              <span class="link-icon">📧</span>
+              <span>Email</span>
+            </button>
+            <button type="button" class="link-type-btn" data-type="spotify">
+              <span class="link-icon">🎵</span>
+              <span>Spotify</span>
+            </button>
           </div>
         </div>
 
@@ -125,6 +133,27 @@
           <!-- Calendar fields -->
           <div class="link-field-group" data-for="calendar">
             <p class="link-hint">Opens Google Calendar in week view to see your upcoming events.</p>
+          </div>
+
+          <!-- Email fields -->
+          <div class="link-field-group" data-for="email">
+            <div class="form-group">
+              <label for="emailTo">Email address</label>
+              <input type="email" id="emailTo" placeholder="friend@example.com">
+            </div>
+            <div class="form-group">
+              <label for="emailSubject">Subject (optional)</label>
+              <input type="text" id="emailSubject" placeholder="Catching up!">
+            </div>
+          </div>
+
+          <!-- Spotify fields -->
+          <div class="link-field-group" data-for="spotify">
+            <div class="form-group">
+              <label for="spotifyUrl">Spotify link</label>
+              <input type="url" id="spotifyUrl" placeholder="https://open.spotify.com/playlist/...">
+            </div>
+            <p class="link-hint">Paste a Spotify link (playlist, album, artist, etc.). Opens in Spotify app.</p>
           </div>
 
         </div>

@@ -40,6 +40,8 @@ weekly-app/
 | None | No link |
 | WhatsApp | Opens chat with specified phone number |
 | Calendar | Opens Google Calendar week view |
+| Email | Opens mail app with recipient and subject |
+| Spotify | Opens Spotify link (playlist, album, etc.) |
 
 ## Local Development
 
