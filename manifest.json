@@ -2,7 +2,7 @@
   "name": "Weekly To-Do",
   "short_name": "Weekly",
   "description": "A playful weekly to-do app with app deep links",
-  "start_url": "/",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#667eea",
   "theme_color": "#667eea",

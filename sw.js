@@ -3,18 +3,16 @@
  * Provides offline caching and PWA functionality
  */
 
-const CACHE_NAME = 'weekly-todo-v1';
+const CACHE_NAME = 'weekly-todo-v2';
 const ASSETS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/css/styles.css',
-  '/js/app.js',
-  '/js/storage.js',
-  '/js/links.js',
-  '/manifest.json',
-  '/icons/icon.svg',
-  '/icons/icon-152.png',
-  '/icons/icon-192.png'
+  './',
+  './index.html',
+  './css/styles.css',
+  './js/app.js',
+  './js/storage.js',
+  './js/links.js',
+  './manifest.json',
+  './icons/icon.svg'
 ];
 
 // Install event - cache assets
