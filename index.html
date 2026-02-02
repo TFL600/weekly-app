@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Weekly">
+  <meta name="theme-color" content="#667eea">
+
+  <title>Weekly To-Do</title>
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+
+  <!-- iOS Icons -->
+  <link rel="apple-touch-icon" href="icons/icon-152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-content">
+        <h1 class="app-title">Weekly ✨</h1>
+        <span class="week-indicator" id="weekIndicator">Week 5</span>
+      </div>
+      <button class="settings-btn" id="settingsBtn" aria-label="Settings">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+      </button>
+    </header>
+
+    <!-- Progress Bar -->
+    <div class="progress-container">
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <span class="progress-text" id="progressText">0 of 0 done</span>
+    </div>
+
+    <!-- To-Do List -->
+    <main class="todo-list" id="todoList">
+      <!-- Empty state (shown when no todos) -->
+      <div class="empty-state" id="emptyState">
+        <div class="empty-icon">📝</div>
+        <h2>No tasks yet!</h2>
+        <p>Tap the + button to add your first weekly to-do</p>
+      </div>
+
+      <!-- Todo items will be rendered here -->
+    </main>
+
+    <!-- Add Button -->
+    <button class="add-btn" id="addBtn" aria-label="Add new to-do">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+    </button>
+
+    <!-- Confetti Canvas -->
+    <canvas id="confetti" class="confetti-canvas"></canvas>
+  </div>
+
+  <!-- Add/Edit Modal -->
+  <div class="modal-overlay" id="todoModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modalTitle">Add To-Do</h2>
+        <button class="modal-close" id="modalClose" aria-label="Close">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <form id="todoForm">
+        <div class="form-group">
+          <label for="todoText">What needs to be done?</label>
+          <input type="text" id="todoText" placeholder="e.g., Message the family group 👨‍👩‍👧‍👦" required maxlength="100">
+        </div>
+
+        <div class="form-group">
+          <label>Link to an app (optional)</label>
+          <div class="link-type-grid" id="linkTypeGrid">
+            <button type="button" class="link-type-btn" data-type="none">
+              <span class="link-icon">❌</span>
+              <span>None</span>
+            </button>
+            <button type="button" class="link-type-btn" data-type="whatsapp">
+              <span class="link-icon">💬</span>
+              <span>WhatsApp</span>
+            </button>
+            <button type="button" class="link-type-btn" data-type="calendar">
+              <span class="link-icon">📅</span>
+              <span>Calendar</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Dynamic link fields -->
+        <div class="link-fields" id="linkFields">
+          <!-- WhatsApp fields -->
+          <div class="link-field-group" data-for="whatsapp">
+            <div class="form-group">
+              <label for="waPhone">Phone number (with country code)</label>
+              <input type="tel" id="waPhone" placeholder="+1234567890">
+            </div>
+            <div class="form-group">
+              <label for="waMessage">Pre-filled message (optional)</label>
+              <input type="text" id="waMessage" placeholder="Hello!">
+            </div>
+          </div>
+
+          <!-- Calendar fields -->
+          <div class="link-field-group" data-for="calendar">
+            <p class="link-hint">Opens Google Calendar in week view to see your upcoming events.</p>
+          </div>
+
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="deleteBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+            Delete
+          </button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal-overlay" id="settingsModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Settings</h2>
+        <button class="modal-close" id="settingsClose" aria-label="Close">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="settings-content">
+        <div class="form-group">
+          <label for="resetDay">Reset checkmarks every</label>
+          <select id="resetDay">
+            <option value="0">Sunday</option>
+            <option value="1" selected>Monday</option>
+            <option value="2">Tuesday</option>
+            <option value="3">Wednesday</option>
+            <option value="4">Thursday</option>
+            <option value="5">Friday</option>
+            <option value="6">Saturday</option>
+          </select>
+        </div>
+
+        <button class="btn btn-warning" id="resetWeekBtn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M23 4v6h-6"></path>
+            <path d="M1 20v-6h6"></path>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+          </svg>
+          Start Fresh (Reset Week)
+        </button>
+
+        <hr class="settings-divider">
+
+        <div class="data-actions">
+          <h3>Data Management</h3>
+          <div class="btn-group">
+            <button class="btn btn-secondary" id="exportBtn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              Export
+            </button>
+            <button class="btn btn-secondary" id="importBtn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+              Import
+            </button>
+          </div>
+          <input type="file" id="importFile" accept=".json" hidden>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/storage.js"></script>
+  <script src="js/links.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
