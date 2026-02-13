@@ -4,8 +4,8 @@
   "description": "A playful weekly to-do app with app deep links",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#667eea",
-  "theme_color": "#667eea",
+  "background_color": "#faf8f5",
+  "theme_color": "#faf8f5",
   "orientation": "portrait",
   "icons": [
     {

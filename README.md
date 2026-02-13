@@ -2,7 +2,7 @@
 
 > **Goal:** Exploring vibe coding in a non-academic context — building a real, usable app through conversational AI collaboration rather than traditional development.
 
-**Live app:** [weekly-review-tfl600.netlify.app](https://weekly-review-tfl600.netlify.app)
+**Live app:** [tfl600.github.io/weekly-app](https://tfl600.github.io/weekly-app/)
 
 ## About
 

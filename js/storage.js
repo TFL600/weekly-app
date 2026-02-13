@@ -19,6 +19,31 @@ const Storage = (function() {
   /**
    * Get all data from localStorage
    */
+  // Default starter todos for first-time users
+  const starterTodos = [
+    {
+      id: 'default-1',
+      text: 'Message a friend',
+      linkType: 'whatsapp',
+      linkData: { phone: '', message: 'Hey! How are you?' },
+      order: 0
+    },
+    {
+      id: 'default-2',
+      text: 'Check weekly schedule',
+      linkType: 'calendar',
+      linkData: {},
+      order: 1
+    },
+    {
+      id: 'default-3',
+      text: 'Go for a walk',
+      linkType: 'none',
+      linkData: {},
+      order: 2
+    }
+  ];
+
   function getData() {
     try {
       const data = localStorage.getItem(STORAGE_KEY);
@@ -28,7 +53,10 @@ const Storage = (function() {
     } catch (e) {
       console.error('Error reading from localStorage:', e);
     }
-    return { ...defaultData };
+    // First time: seed with starter todos
+    const initial = { ...defaultData, todos: [...starterTodos] };
+    saveData(initial);
+    return initial;
   }
 
   /**
