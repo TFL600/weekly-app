@@ -43,6 +43,20 @@ const Sync = (() => {
     localStorage.setItem(KEYS.lastModified, now);
   }
 
+  async function discoverGistId(token) {
+    try {
+      const res = await fetch('https://api.github.com/gists', { headers: getHeaders(token) });
+      if (!res.ok) return null;
+      const gists = await res.json();
+      const match = gists.find(g => g.description === 'Weekly App Sync');
+      if (match) {
+        localStorage.setItem(KEYS.gistId, match.id);
+        return match.id;
+      }
+    } catch (e) {}
+    return null;
+  }
+
   async function push() {
     const token = getToken();
     if (!token) return { ok: false, reason: 'no_token' };
@@ -59,6 +73,10 @@ const Sync = (() => {
         });
         if (!res.ok) return { ok: false, reason: 'push_failed', status: res.status };
       } else {
+        // No gistId — check if one already exists before creating
+        const discovered = await discoverGistId(token);
+        if (discovered) return push();
+
         const res = await fetch('https://api.github.com/gists', {
           method: 'POST',
           headers: getHeaders(token),
@@ -82,8 +100,12 @@ const Sync = (() => {
 
   async function pull() {
     const token = getToken();
-    const gistId = getGistId();
-    if (!token || !gistId) return { ok: false, reason: 'not_configured' };
+    if (!token) return { ok: false, reason: 'no_token' };
+    let gistId = getGistId();
+    if (!gistId) {
+      gistId = await discoverGistId(token);
+      if (!gistId) return { ok: false, reason: 'not_configured' };
+    }
 
     try {
       const res = await fetch(`https://api.github.com/gists/${gistId}`, {
