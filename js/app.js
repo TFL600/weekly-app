@@ -168,10 +168,15 @@
         return;
       }
       updateSyncStatus('syncing');
-      const result = await Sync.push();
+      const result = await Sync.autoSync();
+      if (result.conflict) {
+        showConflictModal(result);
+      } else if (result.ok && result.updated) {
+        renderTodos();
+      }
       updateSyncStatus(result.ok ? 'synced' : 'error');
       updateSyncDot();
-      showToast(result.ok ? 'Synced to cloud \u2601\uFE0F' : 'Sync failed — check your token.');
+      showToast(result.ok ? 'Synced \u2601\uFE0F' : 'Sync failed \u2014 check your token.');
     });
   }
 
