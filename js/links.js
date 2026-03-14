@@ -11,7 +11,8 @@ const Links = (function() {
     whatsapp: { icon: '💬', label: 'WhatsApp' },
     calendar: { icon: '📅', label: 'Calendar' },
     email: { icon: '📧', label: 'Email' },
-    spotify: { icon: '🎵', label: 'Spotify' }
+    spotify: { icon: '🎵', label: 'Spotify' },
+    custom: { icon: '🔗', label: 'Link' }
   };
 
   /**
@@ -19,7 +20,7 @@ const Links = (function() {
    * @param {Object} data - { phone: string, message?: string }
    */
   function generateWhatsAppLink(data) {
-    if (!data.phone) return null;
+    if (!data.phone) return 'https://wa.me'; // open WhatsApp without a specific contact
 
     // Clean phone number (remove spaces, dashes, keep + and digits)
     const phone = data.phone.replace(/[^\d+]/g, '').replace(/^\+/, '');
@@ -30,6 +31,15 @@ const Links = (function() {
     }
 
     return url;
+  }
+
+  /**
+   * Generate custom URL link
+   * @param {Object} data - { url: string }
+   */
+  function generateCustomLink(data) {
+    if (!data.url) return null;
+    return data.url;
   }
 
   /**
@@ -85,6 +95,8 @@ const Links = (function() {
         return generateEmailLink(data);
       case 'spotify':
         return generateSpotifyLink(data);
+      case 'custom':
+        return generateCustomLink(data);
       default:
         return null;
     }

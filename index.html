@@ -41,6 +41,7 @@
           <circle cx="12" cy="12" r="3"></circle>
           <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
         </svg>
+        <span class="sync-dot hidden" id="syncDot"></span>
       </button>
     </header>
 
@@ -96,6 +97,11 @@
         </div>
 
         <div class="form-group">
+          <label for="todoNotes">Notes (optional)</label>
+          <textarea id="todoNotes" rows="2" maxlength="500" placeholder="Add details, context, or reminders..."></textarea>
+        </div>
+
+        <div class="form-group">
           <label>Link to an app (optional)</label>
           <div class="link-type-grid" id="linkTypeGrid">
             <button type="button" class="link-type-btn" data-type="none">
@@ -118,6 +124,10 @@
               <span class="link-icon">🎵</span>
               <span>Spotify</span>
             </button>
+            <button type="button" class="link-type-btn" data-type="custom">
+              <span class="link-icon">🔗</span>
+              <span>Custom</span>
+            </button>
           </div>
         </div>
 
@@ -126,8 +136,9 @@
           <!-- WhatsApp fields -->
           <div class="link-field-group" data-for="whatsapp">
             <div class="form-group">
-              <label for="waPhone">Phone number (with country code)</label>
+              <label for="waPhone">Phone number (optional)</label>
               <input type="tel" id="waPhone" placeholder="+1234567890">
+              <p class="link-hint" style="margin-top:8px;">Leave blank to just open WhatsApp.</p>
             </div>
             <div class="form-group">
               <label for="waMessage">Pre-filled message (optional)</label>
@@ -159,6 +170,14 @@
               <input type="url" id="spotifyUrl" placeholder="https://open.spotify.com/playlist/...">
             </div>
             <p class="link-hint">Paste a Spotify link (playlist, album, artist, etc.). Opens in Spotify app.</p>
+          </div>
+
+          <!-- Custom link fields -->
+          <div class="link-field-group" data-for="custom">
+            <div class="form-group">
+              <label for="customUrl">URL</label>
+              <input type="url" id="customUrl" placeholder="https://...">
+            </div>
           </div>
 
         </div>
@@ -237,6 +256,21 @@
           </div>
           <input type="file" id="importFile" accept=".json" hidden>
         </div>
+
+        <hr class="settings-divider">
+
+        <div class="settings-section">
+          <h3>Sync</h3>
+          <div class="form-group">
+            <label for="gistToken">GitHub Token</label>
+            <input type="password" id="gistToken" placeholder="ghp_...">
+            <p class="link-hint" style="margin-top:8px;">Create at github.com/settings/tokens with "gist" scope. Stored locally on this device only.</p>
+          </div>
+          <div class="sync-status">
+            <span id="syncStatusText" class="sync-status-text">Not configured</span>
+            <button class="btn btn-secondary" id="syncNowBtn">Sync now</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -244,6 +278,7 @@
   <!-- Scripts -->
   <script src="js/storage.js"></script>
   <script src="js/links.js"></script>
+  <script src="js/sync.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

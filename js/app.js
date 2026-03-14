@@ -21,6 +21,7 @@
     modalClose: document.getElementById('modalClose'),
     todoForm: document.getElementById('todoForm'),
     todoText: document.getElementById('todoText'),
+    todoNotes: document.getElementById('todoNotes'),
     linkTypeGrid: document.getElementById('linkTypeGrid'),
     linkFields: document.getElementById('linkFields'),
     deleteBtn: document.getElementById('deleteBtn'),
@@ -32,7 +33,13 @@
     resetWeekBtn: document.getElementById('resetWeekBtn'),
     exportBtn: document.getElementById('exportBtn'),
     importBtn: document.getElementById('importBtn'),
-    importFile: document.getElementById('importFile')
+    importFile: document.getElementById('importFile'),
+
+    // Sync
+    gistToken: document.getElementById('gistToken'),
+    syncNowBtn: document.getElementById('syncNowBtn'),
+    syncStatusText: document.getElementById('syncStatusText'),
+    syncDot: document.getElementById('syncDot')
   };
 
   // ============ State ============
@@ -55,7 +62,7 @@
     // Update week indicator
     updateWeekIndicator();
 
-    // Render todos
+    // Render todos with local data immediately
     renderTodos();
 
     // Setup event listeners
@@ -63,6 +70,23 @@
 
     // Register service worker
     registerServiceWorker();
+
+    // Auto-sync in background (non-blocking)
+    initSync();
+  }
+
+  async function initSync() {
+    if (!Sync.getToken()) return;
+    updateSyncStatus('syncing');
+    const result = await Sync.autoSync();
+    if (result.conflict) {
+      showConflictModal(result);
+    } else if (result.ok && result.updated) {
+      renderTodos();
+      showToast('Synced from cloud \u2601\uFE0F');
+    }
+    updateSyncStatus(result.ok ? 'synced' : 'error');
+    updateSyncDot();
   }
 
   // ============ Event Listeners ============
@@ -116,6 +140,39 @@
         closeSettingsModal();
       }
     });
+
+    // Sync: push on backgrounding
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && Sync.getToken() && Sync.isUnsynced()) {
+        Sync.push().then(() => updateSyncDot());
+      }
+    });
+
+    // Sync: token input
+    elements.gistToken.addEventListener('change', (e) => {
+      const token = e.target.value.trim();
+      if (token) {
+        localStorage.setItem(Sync.KEYS.token, token);
+      } else {
+        localStorage.removeItem(Sync.KEYS.token);
+        localStorage.removeItem(Sync.KEYS.gistId);
+      }
+      updateSyncStatus(token ? 'synced' : 'not_configured');
+      updateSyncDot();
+    });
+
+    // Sync: manual sync button
+    elements.syncNowBtn.addEventListener('click', async () => {
+      if (!Sync.getToken()) {
+        showToast('Enter a GitHub token to sync');
+        return;
+      }
+      updateSyncStatus('syncing');
+      const result = await Sync.push();
+      updateSyncStatus(result.ok ? 'synced' : 'error');
+      updateSyncDot();
+      showToast(result.ok ? 'Synced to cloud \u2601\uFE0F' : 'Sync failed — check your token.');
+    });
   }
 
   // ============ Rendering ============
@@ -161,8 +218,11 @@
         </span>
       </label>
       <div class="todo-content">
-        <span class="todo-text">${escapeHtml(todo.text)}</span>
-        ${hasLink ? `<span class="todo-link-icon" title="Open ${linkInfo.label}">${linkInfo.icon}</span>` : ''}
+        <div class="todo-main-row">
+          <span class="todo-text">${escapeHtml(todo.text)}</span>
+          ${hasLink ? `<span class="todo-link-icon" title="Open ${linkInfo.label}">${linkInfo.icon}</span>` : ''}
+        </div>
+        ${todo.notes ? `<p class="todo-notes">${escapeHtml(todo.notes)}</p>` : ''}
       </div>
       <div class="todo-actions">
         <button class="todo-edit-btn" aria-label="Edit">
@@ -241,12 +301,14 @@
     const text = elements.todoText.value.trim();
     if (!text) return;
 
+    const notes = elements.todoNotes.value.trim();
     const linkData = getLinkDataFromForm();
 
     if (currentEditId) {
       // Update existing
       Storage.updateTodo(currentEditId, {
         text,
+        notes,
         linkType: selectedLinkType,
         linkData
       });
@@ -254,6 +316,7 @@
       // Add new
       Storage.addTodo({
         text,
+        notes,
         linkType: selectedLinkType,
         linkData
       });
@@ -276,6 +339,7 @@
     currentEditId = null;
     elements.modalTitle.textContent = 'Add To-Do';
     elements.todoForm.reset();
+    elements.todoNotes.value = '';
     selectLinkType('none');
     elements.deleteBtn.classList.remove('visible');
     openModal(elements.todoModal);
@@ -286,6 +350,7 @@
     currentEditId = todo.id;
     elements.modalTitle.textContent = 'Edit To-Do';
     elements.todoText.value = todo.text;
+    elements.todoNotes.value = todo.notes || '';
     selectLinkType(todo.linkType);
     populateLinkFields(todo.linkData);
     elements.deleteBtn.classList.add('visible');
@@ -345,6 +410,9 @@
       case 'spotify':
         data.url = document.getElementById('spotifyUrl').value.trim();
         break;
+      case 'custom':
+        data.url = document.getElementById('customUrl').value.trim();
+        break;
       // calendar doesn't need additional data
     }
 
@@ -364,6 +432,9 @@
 
     // Spotify
     document.getElementById('spotifyUrl').value = data.url || '';
+
+    // Custom
+    document.getElementById('customUrl').value = data.url || '';
   }
 
   // ============ Drag and Drop ============
@@ -421,6 +492,86 @@
   function loadSettings() {
     const settings = Storage.getSettings();
     elements.resetDay.value = settings.resetDay;
+    elements.gistToken.value = localStorage.getItem(Sync.KEYS.token) || '';
+    updateSyncStatus(Sync.getToken() ? 'synced' : 'not_configured');
+    updateSyncDot();
+  }
+
+  function updateSyncStatus(state) {
+    const messages = {
+      synced: 'Up to date',
+      syncing: 'Syncing\u2026',
+      error: 'Sync failed',
+      not_configured: 'Not configured'
+    };
+    elements.syncStatusText.textContent = messages[state] || state;
+  }
+
+  function updateSyncDot() {
+    elements.syncDot.classList.toggle('hidden', !Sync.isUnsynced());
+  }
+
+  function showConflictModal(result) {
+    const { localData, remoteData } = result;
+
+    const localById = Object.fromEntries(localData.todos.map(t => [t.id, t]));
+    const remoteById = Object.fromEntries(remoteData.todos.map(t => [t.id, t]));
+    const allIds = new Set([...Object.keys(localById), ...Object.keys(remoteById)]);
+
+    const changes = [];
+    for (const id of allIds) {
+      const local = localById[id];
+      const remote = remoteById[id];
+      if (local && !remote) changes.push({ type: 'local_add', text: local.text });
+      else if (!local && remote) changes.push({ type: 'remote_add', text: remote.text });
+      else if (local && remote && local.text !== remote.text) {
+        changes.push({ type: 'changed', localText: local.text, remoteText: remote.text });
+      }
+    }
+
+    let diffHtml = '';
+    if (changes.length === 0) {
+      diffHtml = '<p style="font-size:0.875rem;color:var(--text-light)">No content differences.</p>';
+    } else {
+      diffHtml = changes.map(c => {
+        if (c.type === 'local_add') return `<div class="conflict-item local-add">+ ${escapeHtml(c.text)} <span>(local only)</span></div>`;
+        if (c.type === 'remote_add') return `<div class="conflict-item remote-add">+ ${escapeHtml(c.text)} <span>(cloud only)</span></div>`;
+        return `<div class="conflict-item changed">~ "${escapeHtml(c.localText)}" \u2192 "${escapeHtml(c.remoteText)}" <span>(cloud)</span></div>`;
+      }).join('');
+    }
+
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay active';
+    overlay.style.zIndex = '300';
+    overlay.innerHTML = `
+      <div class="modal">
+        <div class="modal-header">
+          <h2>Sync Conflict</h2>
+        </div>
+        <p style="margin-bottom:16px;color:var(--text-light);font-size:0.875rem;">Both this device and the cloud changed since last sync.</p>
+        <div class="conflict-diff">${diffHtml}</div>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" id="keepRemoteBtn">Keep Cloud</button>
+          <button class="btn btn-primary" id="keepLocalBtn">Keep Local</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    overlay.querySelector('#keepLocalBtn').addEventListener('click', async () => {
+      overlay.remove();
+      await Sync.resolveConflict(true);
+      updateSyncDot();
+      showToast('Kept local data, synced to cloud \u2601\uFE0F');
+    });
+
+    overlay.querySelector('#keepRemoteBtn').addEventListener('click', async () => {
+      overlay.remove();
+      await Sync.resolveConflict(false);
+      renderTodos();
+      updateSyncDot();
+      showToast('Loaded cloud data \u2601\uFE0F');
+    });
   }
 
   function handleManualReset() {

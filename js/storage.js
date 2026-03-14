@@ -62,9 +62,10 @@ const Storage = (function() {
   /**
    * Save all data to localStorage
    */
-  function saveData(data) {
+  function saveData(data, skipMarkModified = false) {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      if (!skipMarkModified && typeof Sync !== 'undefined') Sync.markModified();
       return true;
     } catch (e) {
       console.error('Error saving to localStorage:', e);
@@ -117,6 +118,7 @@ const Storage = (function() {
     const newTodo = {
       id: generateId(),
       text: todo.text,
+      notes: todo.notes || '',
       linkType: todo.linkType || 'none',
       linkData: todo.linkData || {},
       order: data.todos.length
@@ -262,14 +264,14 @@ const Storage = (function() {
   /**
    * Import data from JSON string
    */
-  function importData(jsonString) {
+  function importData(dataOrString) {
     try {
-      const data = JSON.parse(jsonString);
+      const data = typeof dataOrString === 'string' ? JSON.parse(dataOrString) : dataOrString;
       // Validate structure
       if (!data.todos || !Array.isArray(data.todos)) {
         throw new Error('Invalid data structure');
       }
-      saveData({ ...defaultData, ...data });
+      saveData({ ...defaultData, ...data }, true); // skip markModified — sync sets timestamps itself
       return true;
     } catch (e) {
       console.error('Error importing data:', e);
@@ -279,6 +281,7 @@ const Storage = (function() {
 
   // Public API
   return {
+    getData,
     getTodos,
     addTodo,
     updateTodo,
