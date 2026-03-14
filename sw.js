@@ -3,7 +3,7 @@
  * Provides offline caching and PWA functionality
  */
 
-const CACHE_NAME = 'weekly-todo-v4';
+const CACHE_NAME = 'weekly-todo-v5';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -11,6 +11,7 @@ const ASSETS_TO_CACHE = [
   './js/app.js',
   './js/storage.js',
   './js/links.js',
+  './js/sync.js',
   './manifest.json',
   './icons/icon.svg'
 ];
