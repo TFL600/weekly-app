@@ -111,7 +111,15 @@ const Sync = (() => {
       const res = await fetch(`https://api.github.com/gists/${gistId}`, {
         headers: getHeaders(token)
       });
-      if (!res.ok) return { ok: false, reason: 'pull_failed', status: res.status };
+      if (!res.ok) {
+        if (res.status === 404) {
+          // Gist was deleted — clear stale ID and retry from scratch
+          localStorage.removeItem(KEYS.gistId);
+          localStorage.removeItem(KEYS.lastSync);
+          return pull();
+        }
+        return { ok: false, reason: 'pull_failed', status: res.status };
+      }
 
       const json = await res.json();
       const content = json.files?.['weekly-app.json']?.content;
