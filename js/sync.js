@@ -104,7 +104,7 @@ const Sync = (() => {
     let gistId = getGistId();
     if (!gistId) {
       gistId = await discoverGistId(token);
-      if (!gistId) return { ok: false, reason: 'not_configured' };
+      if (!gistId) return push(); // No remote gist yet — create one
     }
 
     try {
