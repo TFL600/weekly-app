@@ -212,6 +212,9 @@
 
     const linkInfo = Links.getLinkTypeInfo(todo.linkType);
     const hasLink = todo.linkType !== 'none';
+    const hasNotes = !!todo.notes;
+
+    if (hasNotes) div.classList.add('has-notes');
 
     div.innerHTML = `
       <label class="todo-checkbox">
@@ -253,6 +256,11 @@
 
     const editBtn = div.querySelector('.todo-edit-btn');
     editBtn.addEventListener('click', () => openEditModal(todo));
+
+    if (hasNotes) {
+      const content = div.querySelector('.todo-content');
+      content.addEventListener('click', () => div.classList.toggle('notes-open'));
+    }
 
     // Drag events
     div.addEventListener('dragstart', handleDragStart);
@@ -415,9 +423,6 @@
       case 'spotify':
         data.url = document.getElementById('spotifyUrl').value.trim();
         break;
-      case 'custom':
-        data.url = document.getElementById('customUrl').value.trim();
-        break;
       // calendar doesn't need additional data
     }
 
@@ -438,8 +443,6 @@
     // Spotify
     document.getElementById('spotifyUrl').value = data.url || '';
 
-    // Custom
-    document.getElementById('customUrl').value = data.url || '';
   }
 
   // ============ Drag and Drop ============

@@ -354,11 +354,34 @@ body {
   line-height: 1.4;
   word-break: break-word;
   font-weight: 400;
+  display: none;
+}
+
+.todo-item.notes-open .todo-notes {
+  display: block;
+  animation: fadeIn 0.2s ease-out;
 }
 
 .todo-item.completed .todo-notes {
   text-decoration: line-through;
   text-decoration-color: var(--text-light);
+}
+
+.todo-item.has-notes .todo-content {
+  cursor: pointer;
+}
+
+.todo-item.has-notes .todo-text::after {
+  content: '···';
+  font-size: 0.7rem;
+  color: var(--text-light);
+  margin-left: 6px;
+  vertical-align: middle;
+  opacity: 0.6;
+}
+
+.todo-item.has-notes.notes-open .todo-text::after {
+  display: none;
 }
 
 .todo-text {
@@ -588,7 +611,7 @@ body {
 /* Link Type Grid */
 .link-type-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 8px;
 }
 

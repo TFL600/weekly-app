@@ -11,8 +11,7 @@ const Links = (function() {
     whatsapp: { icon: '💬', label: 'WhatsApp' },
     calendar: { icon: '📅', label: 'Calendar' },
     email: { icon: '📧', label: 'Email' },
-    spotify: { icon: '🎵', label: 'Spotify' },
-    custom: { icon: '🔗', label: 'Link' }
+    spotify: { icon: '🎵', label: 'Spotify' }
   };
 
   /**
@@ -33,14 +32,6 @@ const Links = (function() {
     return url;
   }
 
-  /**
-   * Generate custom URL link
-   * @param {Object} data - { url: string }
-   */
-  function generateCustomLink(data) {
-    if (!data.url) return null;
-    return data.url;
-  }
 
   /**
    * Generate Google Calendar link - opens week view to see events
@@ -95,8 +86,6 @@ const Links = (function() {
         return generateEmailLink(data);
       case 'spotify':
         return generateSpotifyLink(data);
-      case 'custom':
-        return generateCustomLink(data);
       default:
         return null;
     }
