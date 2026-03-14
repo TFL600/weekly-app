@@ -48,11 +48,18 @@ const Sync = (() => {
       const res = await fetch('https://api.github.com/gists', { headers: getHeaders(token) });
       if (!res.ok) return null;
       const gists = await res.json();
-      const match = gists.find(g => g.description === 'Weekly App Sync');
-      if (match) {
-        localStorage.setItem(KEYS.gistId, match.id);
-        return match.id;
+      const matches = gists.filter(g => g.description === 'Weekly App Sync');
+      if (!matches.length) return null;
+      // Keep newest, delete extras
+      matches.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+      for (const dupe of matches.slice(1)) {
+        fetch(`https://api.github.com/gists/${dupe.id}`, {
+          method: 'DELETE',
+          headers: getHeaders(token)
+        });
       }
+      localStorage.setItem(KEYS.gistId, matches[0].id);
+      return matches[0].id;
     } catch (e) {}
     return null;
   }
@@ -115,7 +122,7 @@ const Sync = (() => {
         if (res.status === 404) {
           // Gist was deleted — clear stale ID and retry from scratch
           localStorage.removeItem(KEYS.gistId);
-          localStorage.removeItem(KEYS.lastSync);
+          // DO NOT clear lastSync — needed for conflict detection on retry
           return pull();
         }
         return { ok: false, reason: 'pull_failed', status: res.status };
@@ -188,5 +195,11 @@ const Sync = (() => {
     return pull();
   }
 
-  return { push, pull, autoSync, markModified, isUnsynced, resolveConflict, getToken, getGistId, KEYS };
+  function resetSyncState() {
+    localStorage.removeItem(KEYS.gistId);
+    localStorage.removeItem(KEYS.lastSync);
+    localStorage.removeItem(KEYS.lastModified);
+  }
+
+  return { push, pull, autoSync, markModified, isUnsynced, resolveConflict, getToken, getGistId, resetSyncState, KEYS };
 })();

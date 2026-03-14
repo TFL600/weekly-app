@@ -38,6 +38,7 @@
     // Sync
     gistToken: document.getElementById('gistToken'),
     syncNowBtn: document.getElementById('syncNowBtn'),
+    resetSyncBtn: document.getElementById('resetSyncBtn'),
     syncStatusText: document.getElementById('syncStatusText'),
     syncDot: document.getElementById('syncDot')
   };
@@ -177,6 +178,14 @@
       updateSyncStatus(result.ok ? 'synced' : 'error');
       updateSyncDot();
       showToast(result.ok ? 'Synced \u2601\uFE0F' : 'Sync failed \u2014 check your token.');
+    });
+
+    // Sync: reset sync state button
+    elements.resetSyncBtn.addEventListener('click', () => {
+      Sync.resetSyncState();
+      updateSyncStatus('not_configured');
+      updateSyncDot();
+      showToast('Sync state cleared \u2014 press Sync to re-pair');
     });
   }
 
