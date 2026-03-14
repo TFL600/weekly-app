@@ -97,15 +97,7 @@ const Links = (function() {
    */
   function openLink(url) {
     if (!url) return false;
-
-    // For web links, open in new tab/window
-    // For app scheme links, just navigate
-    if (url.startsWith('http')) {
-      window.open(url, '_blank', 'noopener,noreferrer');
-    } else {
-      window.location.href = url;
-    }
-
+    window.location.href = url;
     return true;
   }
 

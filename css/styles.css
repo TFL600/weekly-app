@@ -340,6 +340,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 3px;
+  cursor: pointer;
 }
 
 .todo-main-row {
@@ -354,34 +355,11 @@ body {
   line-height: 1.4;
   word-break: break-word;
   font-weight: 400;
-  display: none;
-}
-
-.todo-item.notes-open .todo-notes {
-  display: block;
-  animation: fadeIn 0.2s ease-out;
 }
 
 .todo-item.completed .todo-notes {
   text-decoration: line-through;
   text-decoration-color: var(--text-light);
-}
-
-.todo-item.has-notes .todo-content {
-  cursor: pointer;
-}
-
-.todo-item.has-notes .todo-text::after {
-  content: '···';
-  font-size: 0.7rem;
-  color: var(--text-light);
-  margin-left: 6px;
-  vertical-align: middle;
-  opacity: 0.6;
-}
-
-.todo-item.has-notes.notes-open .todo-text::after {
-  display: none;
 }
 
 .todo-text {
@@ -409,31 +387,6 @@ body {
 .todo-link-icon:active {
   transform: scale(0.9);
   background: var(--border);
-}
-
-/* Todo Actions */
-.todo-actions {
-  display: flex;
-  gap: 8px;
-}
-
-.todo-edit-btn {
-  width: 34px;
-  height: 34px;
-  border: none;
-  background: var(--bg);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-light);
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-}
-
-.todo-edit-btn:active {
-  background: var(--border);
-  color: var(--text);
 }
 
 /* Add Button */
@@ -891,8 +844,15 @@ body {
 @media print {
   .add-btn,
   .settings-btn,
-  .modal-overlay,
-  .todo-actions {
+  .modal-overlay {
     display: none !important;
   }
+}
+
+.app-version {
+  font-size: 0.75rem;
+  color: var(--text-light);
+  text-align: center;
+  margin-top: 24px;
+  opacity: 0.6;
 }

@@ -212,9 +212,6 @@
 
     const linkInfo = Links.getLinkTypeInfo(todo.linkType);
     const hasLink = todo.linkType !== 'none';
-    const hasNotes = !!todo.notes;
-
-    if (hasNotes) div.classList.add('has-notes');
 
     div.innerHTML = `
       <label class="todo-checkbox">
@@ -232,14 +229,6 @@
         </div>
         ${todo.notes ? `<p class="todo-notes">${escapeHtml(todo.notes)}</p>` : ''}
       </div>
-      <div class="todo-actions">
-        <button class="todo-edit-btn" aria-label="Edit">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-          </svg>
-        </button>
-      </div>
     `;
 
     // Event listeners
@@ -254,13 +243,8 @@
       });
     }
 
-    const editBtn = div.querySelector('.todo-edit-btn');
-    editBtn.addEventListener('click', () => openEditModal(todo));
-
-    if (hasNotes) {
-      const content = div.querySelector('.todo-content');
-      content.addEventListener('click', () => div.classList.toggle('notes-open'));
-    }
+    const content = div.querySelector('.todo-content');
+    content.addEventListener('click', () => openEditModal(todo));
 
     // Drag events
     div.addEventListener('dragstart', handleDragStart);
